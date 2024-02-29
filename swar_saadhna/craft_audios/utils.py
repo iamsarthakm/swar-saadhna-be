@@ -1,80 +1,83 @@
-from swar_saadhna.utils.instrument_scale import create_audio_dict
-import os
 from pydub import AudioSegment
-import pydub.effects as effects
+from swar_saadhna.utils.instrument_scale import (
+    get_audios_for_intruments,
+    get_audios_for_rhythm,
+)
 
-AudioSegment.converter = "/Users/sarthakmaheshwari/opt/anaconda3/condabin/ffmpeg"
-AudioSegment.ffmpeg = "/Users/sarthakmaheshwari/opt/anaconda3/condabin/ffmpeg"
-AudioSegment.ffprobe ="/Users/sarthakmaheshwari/opt/anaconda3/condabin/ffprobe"
+
+def generate_audios(params):
+    intrument = params["intrument"]
+    scale = params["scale"]
+    rhythm = params["rhythm"]
+    tempo = params["tempo"]
+    composition = params["sheet_composition"]
+
+    intrument_audio = get_audios_for_intruments(intrument, scale)
+    rhythm_audios = get_audios_for_rhythm(rhythm)
+
+    composition_audio = get_audio_composition(
+        tempo, intrument_audio, rhythm_audios, composition
+    )
+    composition_audio.export("composition.wav", format="wav")
+    return "audio"
 
 
-def create_audio_using_notations(notes, intrument="harmonium", scale="C#"):
-    """
-    Create an audio file using the provided notations for a specific instrument and scale.
-    
-    Args:
-        intrument (str): The type of instrument.
-        scale (str): The desired scale.
-    """
-    audio_mappings = create_audio_dict(intrument,scale)
-    notes = ['m_ga_s','m_ma_s', 'm_da_k', 'm_da_k', 'm_pa_s', '', 'm_da_k' ,'m_ma_s', 'm_pa_s', 'm_pa_s', 'm_pa_s', 'm_da_k','m_ma_s','m_da_k','m_ma_s','m_ga_s']
+# considering file is 2 sec long
+def get_audio_composition(tempo, intrument_audios, rhythm_audios, composition):
+    output_composition = None
+    for sounds in composition:
+        rhythm_audio = None
+        if "rhythm" in sounds:
+            rhythm_audio = get_formatted_audio_note(
+                rhythm_audios[sounds["rhythm"]], tempo, "mp3"
+            )
 
-    combined = None
-    for note in notes:
-        if note in audio_mappings:
-            audio_file = audio_mappings[note]
+        note_audio = None
+        if "notes" in sounds:
+            bpm = tempo * len(sounds["notes"])
+            for note in sounds["notes"]:
+                if note == "":
+                    note_audio_file = None
+                else:
+                    note_audio_file = intrument_audios[note]
+                if note_audio is None:
+                    note_audio = get_formatted_audio_note(note_audio_file, bpm)
+                else:
+                    note_audio += get_formatted_audio_note(note_audio_file, bpm)
+
+        if not note_audio:
+            continue
+
+        if rhythm_audio is None and note_audio:
+            final_audio = note_audio
+
+        if rhythm_audio and note_audio:
+            final_audio = note_audio.overlay(rhythm_audio, position=0)
+
+        if output_composition is None:
+            output_composition = final_audio
         else:
-            audio_file = None
-        audio = get_formatted_audio(audio_file, 120)
-        if combined is None:
-            combined = audio
-        else:
-            combined += audio
-    combined.export("louder_and_quieter.wav", format="wav")
+            output_composition += final_audio
+
+    return output_composition
 
 
-def get_formatted_audio(audio_file, bpm=60):
-    """
-    Get the formatted audio based on the provided audio file and BPM (beats per minute).
+def get_formatted_audio_note(audio_file, bpm, format="m4a"):
 
-    Args:
-        audio_file (str): The path to the audio file.
-        bpm (int): The desired BPM.
-        
-    Returns:
-        pydub.AudioSegment: The formatted audio segment.
-    """
-    target_duration = (60/bpm) * 1000
-    fade_duration = int((40/100) * target_duration)
+    target_duration = (60 / bpm) * 1000
+    fade_duration = int((1 / 100) * target_duration)
 
-    if audio_file == None:
+    if audio_file is None:
         return AudioSegment.silent(duration=target_duration)
+    print(audio_file)
+    audio = AudioSegment.from_file(audio_file, format=format)
 
-    audio = AudioSegment.from_file(audio_file, format="m4a") 
+    bps = 60 / bpm
+    duration = int(bps * 1000)
+    audio = audio[0:duration]
 
-    # in here we can get a 5 sec audio clip and trim it down for audios, to be done later
-    if bpm == 15:
-        audio = (audio.fade_in(400).fade_out(200))*4
-    elif bpm == 30:
-        audio = (audio.fade_in(200).fade_out(100))*2
-    elif bpm == 60:
-        audio = audio
-    elif bpm == 120:
-        audio = audio[0:500]
-    elif bpm == 180:
-        audio = audio[0:333]
-    elif bpm == 240:
-        audio = audio[0:250]
-    # this part to be redone
-        
     duration_difference = target_duration - len(audio)
     audio = audio + AudioSegment.silent(duration=duration_difference)
     audio = audio.fade_in(fade_duration).fade_out(fade_duration)
-    # audio = effects.normalize(audio)
-    # audio = match_target_amplitude(audio, -20.0)
+
     return audio
-
-
-def match_target_amplitude(sound, target_dBFS):
-    change_in_dBFS = target_dBFS - sound.dBFS
-    return sound.apply_gain(change_in_dBFS)

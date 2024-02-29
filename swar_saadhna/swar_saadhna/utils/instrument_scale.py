@@ -1,113 +1,122 @@
 import os
 import re
+from .scales import scales
 
-
-# first there is ocatve, then note, then its variable such as shudh, komal or teevra
-# if lower-l , middle-m, higher-h
-# sa , re, ga, ma, pa, dha, ni , sa
-# shudh-> -s, komal -k, teevra-t
-path = "./swar_saadhna/instrument_sounds/harmonium/"
-reference_mapping = {
-    1: 'l_sa_s',
-    2: 'l_re_k',
-    3: 'l_re_s', 
-    4: 'l_ga_k', 
-    5: 'l_ga_s', 
-    6: 'l_ma_s', 
-    7: 'l_ma_t', 
-    8: 'l_pa_s', 
-    9: 'l_da_k', 
-    10: 'l_da_s', 
-    11: 'l_ni_k', 
-    12: 'l_ni_s', 
-    13: 'm_sa_s', 
-    14: 'm_re_k', 
-    15: 'm_re_s', 
-    16: 'm_ga_k', 
-    17: 'm_ga_s', 
-    18: 'm_ma_s', 
-    19: 'm_ma_t', 
-    20: 'm_pa_s', 
-    21: 'm_da_k', 
-    22: 'm_da_s', 
-    23: 'm_ni_k', 
-    24: 'm_ni_s', 
-    25: 'h_sa_s', 
-    26: 'h_re_k', 
-    27: 'h_re_s', 
-    28: 'h_ga_k', 
-    29: 'h_ga_s', 
-    30: 'h_ma_s', 
-    31: 'h_ma_t', 
-    32: 'h_pa_s', 
-    33: 'h_da_k', 
-    34: 'h_da_s', 
-    35: 'h_ni_k', 
-    36: 'h_ni_s'
-    }
-notes_array = ['m_ga_s','m_ma_s', 'm_da_k', '', 'm_pa_s', '', 'm_da_k' ,'m_ma_s', 'm_pa_s', '', '', 'm_da_k','m_ma_s','m_da_k','m_ma_s','m_ga_s']
-
-
-def create_audio_dict(intrument_type, scale):
-    """
-    Create a dictionary mapping note names to audio file paths based on the given instrument type and scale.
-    Args:
-        intrument_type (str): The type of instrument.
-        scale (str): The desired scale.
-    Returns:
-        dict: A dictionary mapping note names to audio file paths.
-    """
-    audio_dict = {}
-    folder_path = get_folder_path(intrument_type)
-    files = sorted(os.listdir(folder_path), key=lambda x: int(re.findall(r'\d+', x)[0]))
-    for filename in files:
-        name = int(os.path.splitext(filename)[0])
-        audio_file = os.path.join(folder_path, filename)
-        adjust_scale = get_scale_adjusting_value(scale)
-        if name + adjust_scale>=1 and name+adjust_scale <=36:
-            audio_dict[reference_mapping[name+adjust_scale]] = audio_file
-
-    return audio_dict
-
-def get_scale_adjusting_value(scale):
-    """
-    Get the scale adjusting value based on the given scale.
-    
-    Args:
-        scale (str): The desired scale.
-        
-    Returns:
-        int: The scale adjusting value.
-    """
-    if scale == "D#":
-        return -2
-    elif scale == "D":
-        return -1
-    elif scale == 'C#':
-        return 0
-    elif scale == "C":
-        return 1
-    elif scale == "B":
-        return 2
-    elif scale == "A#":
-        return 3
-    elif scale == "A":
-        return 4
-    elif scale == "G#":
-        return 5
-    elif scale == "G":
-        return 6
-    elif scale == "F#":
-        return 7
 
 def get_folder_path(intrument_type):
     """
     Get the folder path for the given instrument type.
-    
+
     Args:
         intrument_type (str): The type of instrument.
-        
+
     Returns:
         str: The folder path.
     """
     return f"./swar_saadhna/instrument_sounds/{intrument_type}"
+
+
+def notes_audio_mapping(instrument):
+    mapping = {
+        1: f"./swar_saadhna/instrument_sounds/{instrument}/1.m4a",
+        2: f"./swar_saadhna/instrument_sounds/{instrument}/2.m4a",
+        3: f"./swar_saadhna/instrument_sounds/{instrument}/3.m4a",
+        4: f"./swar_saadhna/instrument_sounds/{instrument}/4.m4a",
+        5: f"./swar_saadhna/instrument_sounds/{instrument}/5.m4a",
+        6: f"./swar_saadhna/instrument_sounds/{instrument}/6.m4a",
+        7: f"./swar_saadhna/instrument_sounds/{instrument}/7.m4a",
+        8: f"./swar_saadhna/instrument_sounds/{instrument}/8.m4a",
+        9: f"./swar_saadhna/instrument_sounds/{instrument}/9.m4a",
+        10: f"./swar_saadhna/instrument_sounds/{instrument}/10.m4a",
+        11: f"./swar_saadhna/instrument_sounds/{instrument}/11.m4a",
+        12: f"./swar_saadhna/instrument_sounds/{instrument}/12.m4a",
+        13: f"./swar_saadhna/instrument_sounds/{instrument}/13.m4a",
+        14: f"./swar_saadhna/instrument_sounds/{instrument}/14.m4a",
+        15: f"./swar_saadhna/instrument_sounds/{instrument}/15.m4a",
+        16: f"./swar_saadhna/instrument_sounds/{instrument}/16.m4a",
+        17: f"./swar_saadhna/instrument_sounds/{instrument}/17.m4a",
+        18: f"./swar_saadhna/instrument_sounds/{instrument}/18.m4a",
+        19: f"./swar_saadhna/instrument_sounds/{instrument}/19.m4a",
+        20: f"./swar_saadhna/instrument_sounds/{instrument}/20.m4a",
+        21: f"./swar_saadhna/instrument_sounds/{instrument}/21.m4a",
+        22: f"./swar_saadhna/instrument_sounds/{instrument}/22.m4a",
+        23: f"./swar_saadhna/instrument_sounds/{instrument}/23.m4a",
+        24: f"./swar_saadhna/instrument_sounds/{instrument}/24.m4a",
+        25: f"./swar_saadhna/instrument_sounds/{instrument}/25.m4a",
+        26: f"./swar_saadhna/instrument_sounds/{instrument}/26.m4a",
+        27: f"./swar_saadhna/instrument_sounds/{instrument}/27.m4a",
+        28: f"./swar_saadhna/instrument_sounds/{instrument}/28.m4a",
+        29: f"./swar_saadhna/instrument_sounds/{instrument}/29.m4a",
+        30: f"./swar_saadhna/instrument_sounds/{instrument}/30.m4a",
+        31: f"./swar_saadhna/instrument_sounds/{instrument}/31.m4a",
+        32: f"./swar_saadhna/instrument_sounds/{instrument}/32.m4a",
+        33: f"./swar_saadhna/instrument_sounds/{instrument}/33.m4a",
+        34: f"./swar_saadhna/instrument_sounds/{instrument}/34.m4a",
+        35: f"./swar_saadhna/instrument_sounds/{instrument}/35.m4a",
+        36: f"./swar_saadhna/instrument_sounds/{instrument}/36.m4a",
+    }
+    return mapping
+
+
+notes = [
+    "l_sa_s",
+    "l_re_k",
+    "l_re_s",
+    "l_ga_k",
+    "l_ga_s",
+    "l_ma_s",
+    "l_ma_t",
+    "l_pa_s",
+    "l_da_k",
+    "l_da_s",
+    "l_ni_k",
+    "l_ni_s",
+    "m_sa_s",
+    "m_re_k",
+    "m_re_s",
+    "m_ga_k",
+    "m_ga_s",
+    "m_ma_s",
+    "m_ma_t",
+    "m_pa_s",
+    "m_da_k",
+    "m_da_s",
+    "m_ni_k",
+    "m_ni_s",
+    "h_sa_s",
+    "h_re_k",
+    "h_re_s",
+    "h_ga_k",
+    "h_ga_s",
+    "h_ma_s",
+    "h_ma_t",
+    "h_pa_s",
+    "h_da_k",
+    "h_da_s",
+    "h_ni_k",
+    "h_ni_s",
+]
+
+
+def get_audios_for_intruments(intrument, scale):
+    mapping = {}
+    print(scales)
+    notes_mapping = notes_audio_mapping(intrument)
+    for note in notes:
+        if scales[scale][note] is not None:
+            mapping[note] = notes_mapping[scales[scale][note]]
+        else:
+            mapping[note] = None
+
+    return mapping
+
+
+def get_audios_for_rhythm(rhythm):
+    mapping = {}
+    folder_path = get_folder_path(rhythm)
+    files = sorted(os.listdir(folder_path), key=lambda x: int(re.findall(r"\d+", x)[0]))
+    for filename in files:
+        mapping[filename.split("/")[-1].split(".")[0]] = (
+            f"./swar_saadhna/instrument_sounds/{rhythm}/{filename}"
+        )
+    return mapping

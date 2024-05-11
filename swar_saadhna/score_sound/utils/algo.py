@@ -1,6 +1,5 @@
 from .static import scales, notes
 import os
-import re
 from pydub import AudioSegment
 
 
@@ -40,7 +39,7 @@ def notes_audio_mapping(instrument):
 def get_audios_for_rhythm(beat):
     mapping = {}
     folder_path = f"./score_sound/media/{beat}/"
-    files = sorted(os.listdir(folder_path), key=lambda x: int(re.findall(r"\d+", x)[0]))
+    files = os.listdir(folder_path)
     for filename in files:
         mapping[filename.split("/")[-1].split(".")[0]] = (
             f"./score_sound/media/{beat}/{filename}"
@@ -122,7 +121,7 @@ def get_formatted_audio_note(audio_file, bpm, format="m4a"):
     return audio
 
 
-def generate_audios_algo(scale, tempo, instrument, rhythm, composition):
+def generate_audios_algo(scale, tempo, instrument, rhythm, composition, name):
 
     instrument_audio = get_scale_audios_for_instruments(instrument, scale)
     rhythm_audios = get_audios_for_rhythm(rhythm)
@@ -130,5 +129,6 @@ def generate_audios_algo(scale, tempo, instrument, rhythm, composition):
     composition_audio = get_audio_composition(
         tempo, instrument_audio, rhythm_audios, composition
     )
-    composition_audio.export("composition.wav", format="wav")
-    return "audio"
+    saved_path = f"{name}.wav"
+    composition_audio.export(saved_path, format="wav")
+    return saved_path

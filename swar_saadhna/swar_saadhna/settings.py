@@ -12,10 +12,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 from decouple import config
 from pathlib import Path
-import os
 
-print(os.environ["PATH"])
-print("sdf")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -42,8 +39,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "craft_audios",
     "score_sound",
+    "users",
     "corsheaders",
 ]
 
@@ -56,6 +53,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "corsheaders.middleware.CorsMiddleware",
+    "swar_saadhna.middleware.VerifyAuthToken",
 ]
 CORS_ORIGIN_ALLOW_ALL = True
 ROOT_URLCONF = "swar_saadhna.urls"
@@ -113,6 +111,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+REST_FRAMEWORK = {"EXCEPTION_HANDLER": "swar_saadhna.utils.custom_exception_handler"}
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
@@ -134,3 +133,18 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+
+
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_HOST_USER = "fantasticsrthk@gmail.com"
+EMAIL_HOST_PASSWORD = "tfzb behp czzf dcgu"
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+
+JWT_SECRET_KEY = config("JWT_SECRET_KEY")
+REGION_NAME = config("REGION_NAME")
+AWS_ACCESS_KEY_ID = config("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = config("AWS_SECRET_ACCESS_KEY")
+BUCKET_NAME = config("BUCKET_NAME")

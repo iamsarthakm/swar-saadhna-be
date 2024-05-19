@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "score_sound",
     "users",
     "corsheaders",
+    "groups",
 ]
 
 MIDDLEWARE = [
@@ -117,7 +118,7 @@ REST_FRAMEWORK = {"EXCEPTION_HANDLER": "swar_saadhna.utils.custom_exception_hand
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "Asia/Kolkata"
 
 USE_I18N = True
 

@@ -9,4 +9,6 @@ class User(models.Model):
     password = models.CharField(max_length=128)
     phone_number = models.CharField(max_length=10, null=True)
     email = models.EmailField(max_length=255, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     is_deleted = models.BooleanField(default=False)

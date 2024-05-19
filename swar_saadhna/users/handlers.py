@@ -2,7 +2,11 @@ from .models import User
 from django.contrib.auth.hashers import make_password
 from rest_framework.response import Response
 from rest_framework import status
-from .utils import mail_pin_to_user, generate_4_digit_pin, check_credentials
+from .utils import (
+    send_pin_to_user,
+    generate_4_digit_pin,
+    check_credentials,
+)
 import jwt
 from django.conf import settings
 from datetime import datetime, timedelta
@@ -19,7 +23,7 @@ class UserHandlers:
             "email": data.get("email"),
         }
         user = User.objects.create(**user_data)
-        mail_pin_to_user(data.get("username"), pin)
+        send_pin_to_user(data.get("username"), pin)
         return Response(
             {"data": user.id, "message": "User saved successfully"}, status.HTTP_200_OK
         )
@@ -42,3 +46,10 @@ class UserHandlers:
             {"data": None, "message": "wrong credentials"},
             status.HTTP_200_OK,
         )
+
+
+# class UserGroup(models.Model):
+#     user = models.ForeignKey(User, on_delete=models.CASCADE)
+#     group = models.ForeignKey(Group, on_delete=models.CASCADE)
+#     group_permissions = models.JSONField(default=list)  # Stores group permissions
+#     audio_permissions = models.JSONField(default=list)

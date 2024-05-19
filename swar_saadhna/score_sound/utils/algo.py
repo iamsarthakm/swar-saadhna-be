@@ -38,11 +38,11 @@ def notes_audio_mapping(instrument):
 
 def get_audios_for_rhythm(beat):
     mapping = {}
-    folder_path = f"./score_sound/media/{beat}/"
+    folder_path = f"./score_sound/media/taals/{beat}/"
     files = os.listdir(folder_path)
     for filename in files:
         mapping[filename.split("/")[-1].split(".")[0]] = (
-            f"./score_sound/media/{beat}/{filename}"
+            f"./score_sound/media/taals/{beat}/{filename}"
         )
     return mapping
 

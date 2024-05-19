@@ -1,11 +1,12 @@
-from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .utils.algo import generate_audios_algo
 from .serializers import (
-    CreateAudiosSerializers,
+    CreateAudioSerializers,
     AudioScoreSerializer,
-    GetAudiosSerializer,
+    GetAudioSerializer,
+    CreateTaalSerializer,
+    EditAudioSerializer,
 )
 from .utils.utils import (
     get_music_data,
@@ -13,14 +14,14 @@ from .utils.utils import (
     get_user_id_from_token,
     get_audio_util,
 )
-from .models import AudioScore
+from .models import AudioScore, Taal
 import os
 import uuid
 
 
 class AudioHandler:
     def get_audios(request):
-        validate_data = GetAudiosSerializer(data=request.query_params)
+        validate_data = GetAudioSerializer(data=request.query_params)
         if not validate_data.is_valid():
             return Response(
                 {"message": validate_data.errors},
@@ -31,7 +32,7 @@ class AudioHandler:
         return Response(audios_data, status=status.HTTP_200_OK)
 
     def create_audio(request):
-        validate_data = CreateAudiosSerializers(data=request.data)
+        validate_data = CreateAudioSerializers(data=request.data)
         if not validate_data.is_valid():
             return Response(
                 {"message": validate_data.errors},
@@ -60,3 +61,22 @@ class AudioHandler:
         )
         serializer = AudioScoreSerializer(audio_obj_details)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class TaalHandler:
+    def get_taal(request):
+        name = request.query_params["name"]
+        taal = Taal.objects.filter(name=name).first()
+        return Response(taal.beats, status=status.HTTP_200_OK)
+
+    def create_taal(request):
+        validate_data = CreateTaalSerializer(data=request.data)
+        if not validate_data.is_valid():
+            return Response(
+                {"message": validate_data.errors},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        name = validate_data.validated_data["name"]
+        beats = validate_data.validated_data["beats"]
+        taal = Taal.objects.create(name=name, beats=beats)
+        return Response(taal.name, status=status.HTTP_200_OK)

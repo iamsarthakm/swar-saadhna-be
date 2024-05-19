@@ -1,10 +1,11 @@
 from django.db import models
-from users.models import User
 
 # Create your models here.
 
 
 class AudioScore(models.Model):
+    from users.models import User
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     scale = models.CharField(max_length=20)
@@ -14,6 +15,6 @@ class AudioScore(models.Model):
     audio_url = models.CharField(max_length=255, null=True)
 
 
-class Taal:
+class Taal(models.Model):
     name = models.CharField(max_length=255)
     beats = models.JSONField()

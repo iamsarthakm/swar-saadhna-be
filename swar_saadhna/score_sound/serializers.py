@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .models import AudioScore
 
 
-class CreateAudiosSerializers(serializers.Serializer):
+class CreateAudioSerializers(serializers.Serializer):
     name = serializers.CharField(max_length=255)
     scale = serializers.CharField(max_length=255)
     tempo = serializers.IntegerField()
@@ -32,7 +32,7 @@ class TaalSerializer(serializers.Serializer):
         return super().validate(attrs)
 
 
-class GetAudiosSerializer(serializers.Serializer):
+class GetAudioSerializer(serializers.Serializer):
     limit = serializers.IntegerField(default=10)
     offset = serializers.IntegerField(default=0)
     search = serializers.CharField(max_length=255, default="")
@@ -44,3 +44,21 @@ class AudioScoreSerializer(serializers.ModelSerializer):
     class Meta:
         model = AudioScore
         fields = "__all__"
+
+
+class CreateTaalSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=20)
+    beats = serializers.ListField(child=serializers.CharField(max_length=20))
+
+    def validate(self, attrs):
+        return super().validate(attrs)
+
+
+class EditAudioSerializer(serializers.Serializer):
+    scale = serializers.CharField()
+    tempo = serializers.IntegerField()
+    instrument = serializers.CharField()
+    rhythm = serializers.CharField()
+
+    def validate(self, attrs):
+        return super().validate(attrs)

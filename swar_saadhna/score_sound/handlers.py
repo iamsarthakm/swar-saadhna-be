@@ -6,15 +6,18 @@ from .serializers import (
     AudioScoreSerializer,
     GetAudioSerializer,
     CreateTaalSerializer,
-    EditAudioSerializer,
+    GetCompositionSerializer,
+    CreateCompositionSerializer,
 )
 from .utils.utils import (
     get_music_data,
     save_to_s3,
     get_user_id_from_token,
     get_audio_util,
+    get_composition_util,
+    create_composition_util,
 )
-from .models import AudioScore, Taal
+from .models import AudioScore, Taal, Composition
 import os
 import uuid
 
@@ -38,9 +41,12 @@ class AudioHandler:
                 {"message": validate_data.errors},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        name, scale, tempo, instrument, rhythm, composition = get_music_data(
+        name, scale, tempo, instrument, composition_id = get_music_data(
             validate_data.validated_data, request
         )
+        composition_obj = Composition.objects.filter(id=composition_id).first()
+        rhythm = composition_obj.rhythm
+        composition = composition_obj.notes_and_beats
         user_id = get_user_id_from_token(request)
         temp_audio_path = generate_audios_algo(
             scale, tempo, instrument, rhythm, composition, name
@@ -54,8 +60,7 @@ class AudioHandler:
             name=name,
             scale=scale,
             tempo=tempo,
-            rhythm=rhythm,
-            composition=composition,
+            composition_id=composition_id,
             user_id=user_id,
             audio_url=audio_url,
         )
@@ -80,3 +85,27 @@ class TaalHandler:
         beats = validate_data.validated_data["beats"]
         taal = Taal.objects.create(name=name, beats=beats)
         return Response(taal.name, status=status.HTTP_200_OK)
+
+
+class CompositionHandler:
+    def get_composition(request):
+        validate_data = GetCompositionSerializer(data=request.query_params)
+        if not validate_data.is_valid():
+            return Response(
+                {"message": validate_data.errors},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        user_id = get_user_id_from_token(request)
+        audios_data = get_composition_util(user_id, validate_data.validated_data)
+        return Response(audios_data, status=status.HTTP_200_OK)
+
+    def create_composition(request):
+        validate_data = CreateCompositionSerializer(data=request.data)
+        if not validate_data.is_valid():
+            return Response(
+                {"message": validate_data.errors},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        user_id = get_user_id_from_token(request)
+        audios_data = create_composition_util(user_id, validate_data.validated_data)
+        return Response(audios_data, status=status.HTTP_200_OK)

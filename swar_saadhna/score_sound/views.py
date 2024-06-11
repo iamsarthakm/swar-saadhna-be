@@ -1,5 +1,13 @@
 from rest_framework.views import APIView
-from .handlers import AudioHandler, TaalHandler
+from .handlers import AudioHandler, TaalHandler, CompositionHandler
+
+
+class Composition(APIView):
+    def get(self, request):
+        return CompositionHandler.get_composition(request)
+
+    def post(self, request):
+        return CompositionHandler.create_composition(request)
 
 
 class Audios(APIView):
@@ -8,9 +16,6 @@ class Audios(APIView):
 
     def post(self, request):
         return AudioHandler.create_audio(request)
-
-    def put(self, request):
-        return AudioHandler.edit_audio(request)
 
 
 class Taal(APIView):

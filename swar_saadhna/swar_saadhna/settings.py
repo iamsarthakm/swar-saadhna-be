@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
+
 from decouple import config
 from pathlib import Path
 
@@ -54,7 +55,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "corsheaders.middleware.CorsMiddleware",
-    "swar_saadhna.middleware.VerifyAuthToken",
+    # "swar_saadhna.middleware.VerifyAuthToken",
 ]
 CORS_ORIGIN_ALLOW_ALL = True
 ROOT_URLCONF = "swar_saadhna.urls"

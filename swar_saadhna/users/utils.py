@@ -5,11 +5,13 @@ import random
 import boto3
 from botocore.exceptions import BotoCoreError, ClientError
 import jwt
+import requests
 
 # from django.core.cache import cache
 from django.conf import settings
 import re
 from swar_saadhna.utils import CustomException
+from django.core.cache import cache
 
 
 def check_credentials(username, password):
@@ -32,8 +34,9 @@ def send_pin_to_user(username, pin):
         )
 
     elif username_type == "phone":
-        send_sms(username, f"The pin for your login is {pin}")
-
+        token = get_message_token()
+        response = send_pass_to_user(token, username)
+        # send_sms(username, f"The pin for your login is {pin}")
     else:
         raise CustomException("Please enter correct username")
 
@@ -88,3 +91,35 @@ def get_user_id_from_token(request):
         token, settings.JWT_SECRET_KEY, verify=True, algorithms=["HS256"]
     )
     return payload.get("id", None)
+
+
+def get_message_token():
+    token = cache.get("msg_token")
+    if token is None:
+        token = get_message_verification_token()
+        set_token(token)
+    return token
+
+
+def set_token(token):
+    timeout_7_days = 7 * 24 * 60 * 60
+    cache.set("user_token", token, timeout=timeout_7_days)
+
+
+def get_message_verification_token():
+    url = "https://cpaas.messagecentral.com/auth/v1/authentication/token?country=IN&customerId=C-DE251B4119374E5&key=JTt9ckUuN144TyU4wqM=&scope=NEW"
+    payload = {}
+    headers = {"accept": "*/*"}
+    response = requests.request("GET", url, headers=headers, data=payload)
+    return response.json()["token"]
+
+
+def send_pass_to_user(token, phone_number):
+    url = f"https://cpaas.messagecentral.com/verification/v2/verification/send?countryCode=91&customerId=C-DE251B4119374E5&flowType=SMS&mobileNumber={phone_number}"
+
+    payload = {}
+    headers = {"authToken": token}
+
+    response = requests.request("POST", url, headers=headers, data=payload)
+
+    return response.json()

@@ -7,8 +7,7 @@ class CreateAudioSerializers(serializers.Serializer):
     scale = serializers.CharField(max_length=255)
     tempo = serializers.IntegerField()
     instrument = serializers.CharField(max_length=255)
-    rhythm = serializers.CharField(max_length=255)
-    sheet_composition = serializers.ListField(default=[])
+    composition_id = serializers.IntegerField()
 
     def validate(self, attrs):
 
@@ -59,6 +58,27 @@ class EditAudioSerializer(serializers.Serializer):
     tempo = serializers.IntegerField()
     instrument = serializers.CharField()
     rhythm = serializers.CharField()
+
+    def validate(self, attrs):
+        return super().validate(attrs)
+
+
+class GetCompositionSerializer(serializers.Serializer):
+    limit = serializers.IntegerField(default=10)
+    offset = serializers.IntegerField(default=0)
+    search = serializers.CharField(max_length=255, default="")
+    sort_col = serializers.CharField(default="id")
+    sort_dir = serializers.CharField(default="-")
+
+    def validate(self, attrs):
+        return super().validate(attrs)
+
+
+class CreateCompositionSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=255)
+    notes_and_beats = serializers.ListField(default=[])
+    details = serializers.JSONField(default={})
+    rhythm = serializers.CharField(max_length=255)
 
     def validate(self, attrs):
         return super().validate(attrs)

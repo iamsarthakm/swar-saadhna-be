@@ -2,7 +2,7 @@ import jwt
 from django.conf import settings
 import boto3
 from botocore.exceptions import ClientError
-from score_sound.models import AudioScore
+from score_sound.models import AudioScore, Composition
 
 
 def get_music_data(data, request):
@@ -10,9 +10,8 @@ def get_music_data(data, request):
     name = data["name"]
     tempo = data["tempo"]
     instrument = data["instrument"]
-    rhythm = data["rhythm"]
-    composition = data["sheet_composition"]
-    return name, scale, tempo, instrument, rhythm, composition
+    composition_id = data["composition_id"]
+    return name, scale, tempo, instrument, composition_id
 
 
 def generate_presigned_url(object_key, expiration=3600):
@@ -71,10 +70,43 @@ def get_audio_util(user_id, params):
 
     for audios in audios_list:
         if audios["audio_url"]:
-            audios["presigned_url"] = None
+            audios["presigned_url"] = generate_presigned_url(audios["audio_url"])
         else:
             audios["presigned_url"] = None
     return audios_list
 
 
+def get_composition_util(user_id, params):
+    search = params["search"]
+    offset = params["offset"]
+    limit = params["limit"]
+    order = params["sort_dir"] + params["sort_col"]
+    compositions = (
+        Composition.objects.filter(name__icontains=search, user__id=user_id)
+        .order_by(order)
+        .values()[offset : limit + offset]
+    )
 
+    for composition in compositions:
+        if composition["url"]:
+            composition["url"] = generate_presigned_url(composition["audio_url"])
+        else:
+            composition["presigned_url"] = None
+    return compositions
+
+
+def create_composition_util(user_id, data):
+    notes_and_beats = data["notes_and_beats"]
+    details = data["details"]
+    rhythm = data["rhythm"]
+    name = data["name"]
+
+    composition = Composition.objects.create(
+        notes_and_beats=notes_and_beats,
+        details=details,
+        rhythm=rhythm,
+        user_id=user_id,
+        name=name,
+    )
+
+    return composition.id

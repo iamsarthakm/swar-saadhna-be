@@ -1,0 +1,8 @@
+dont focus on generating music, just the basic types patterns (sequential, jumping seq, reverse, reverse jumping, custom(through one input))
+add guitar and piano notes asap
+write functionality to generate music composition all chords (c2-c4)
+explore these articles
+    https://medium.com/@lfoster49203/generating-new-music-with-deep-learning-an-introduction-to-music-generation-with-rnns-in-python-d846b558ed52
+    https://web.mit.edu/music21/doc/about/what.html
+
+user journey

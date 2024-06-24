@@ -1,5 +1,6 @@
 from django.apps import AppConfig
 
-class ScoreSoundConfig(AppConfig):
+
+class GroupsConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
-    name = "score_sound"
+    name = "groups"

@@ -2,13 +2,12 @@ from rest_framework import serializers
 from .models import AudioScore
 
 
-class CreateAudiosSerializers(serializers.Serializer):
+class CreateAudioSerializers(serializers.Serializer):
     name = serializers.CharField(max_length=255)
     scale = serializers.CharField(max_length=255)
     tempo = serializers.IntegerField()
     instrument = serializers.CharField(max_length=255)
-    rhythm = serializers.CharField(max_length=255)
-    sheet_composition = serializers.ListField(default=[])
+    composition_id = serializers.IntegerField()
 
     def validate(self, attrs):
 
@@ -32,7 +31,7 @@ class TaalSerializer(serializers.Serializer):
         return super().validate(attrs)
 
 
-class GetAudiosSerializer(serializers.Serializer):
+class GetAudioSerializer(serializers.Serializer):
     limit = serializers.IntegerField(default=10)
     offset = serializers.IntegerField(default=0)
     search = serializers.CharField(max_length=255, default="")
@@ -43,4 +42,43 @@ class GetAudiosSerializer(serializers.Serializer):
 class AudioScoreSerializer(serializers.ModelSerializer):
     class Meta:
         model = AudioScore
-        fields = "__all__"
+        fields = ["id", "name"]
+
+
+class CreateTaalSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=20)
+    beats = serializers.ListField(child=serializers.CharField(max_length=20))
+
+    def validate(self, attrs):
+        return super().validate(attrs)
+
+
+class EditAudioSerializer(serializers.Serializer):
+    scale = serializers.CharField()
+    tempo = serializers.IntegerField()
+    instrument = serializers.CharField()
+    rhythm = serializers.CharField()
+
+    def validate(self, attrs):
+        return super().validate(attrs)
+
+
+class GetCompositionSerializer(serializers.Serializer):
+    limit = serializers.IntegerField(default=10)
+    offset = serializers.IntegerField(default=0)
+    search = serializers.CharField(max_length=255, default="")
+    sort_col = serializers.CharField(default="id")
+    sort_dir = serializers.CharField(default="-")
+
+    def validate(self, attrs):
+        return super().validate(attrs)
+
+
+class CreateCompositionSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=255)
+    notes_and_beats = serializers.ListField(default=[])
+    details = serializers.JSONField(default={})
+    rhythm = serializers.CharField(max_length=255)
+
+    def validate(self, attrs):
+        return super().validate(attrs)

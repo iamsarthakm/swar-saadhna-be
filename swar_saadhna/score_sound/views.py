@@ -1,11 +1,13 @@
 from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from .utils.algo import generate_audios_algo
-from .serializers import TaalSerializer, CreateAudiosSerializers
+from .handlers import AudioHandler, TaalHandler, CompositionHandler
 
-# Create your views here.
-from .handlers import AudioHandler
+
+class Composition(APIView):
+    def get(self, request):
+        return CompositionHandler.get_composition(request)
+
+    def post(self, request):
+        return CompositionHandler.create_composition(request)
 
 
 class Audios(APIView):
@@ -18,22 +20,7 @@ class Audios(APIView):
 
 class Taal(APIView):
     def get(self, request):
-        data = [
-            "dha",
-            "dha",
-            "dha",
-            "dha",
-            "dha",
-            "dha",
-            "dha",
-            "dha",
-            "dha",
-            "dha",
-            "dha",
-            "dha",
-            "dha",
-            "dha",
-            "dha",
-            "dha",
-        ]
-        return Response(data)
+        return TaalHandler.get_taal(request)
+
+    def post(self, request):
+        return TaalHandler.create_taal(request)

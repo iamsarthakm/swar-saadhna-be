@@ -38,11 +38,11 @@ def notes_audio_mapping(instrument):
 
 def get_audios_for_rhythm(beat):
     mapping = {}
-    folder_path = f"./score_sound/media/{beat}/"
+    folder_path = f"./score_sound/media/taals/{beat}/"
     files = os.listdir(folder_path)
     for filename in files:
         mapping[filename.split("/")[-1].split(".")[0]] = (
-            f"./score_sound/media/{beat}/{filename}"
+            f"./score_sound/media/taals/{beat}/{filename}"
         )
     return mapping
 
@@ -129,6 +129,6 @@ def generate_audios_algo(scale, tempo, instrument, rhythm, composition, name):
     composition_audio = get_audio_composition(
         tempo, instrument_audio, rhythm_audios, composition
     )
-    saved_path = f"{name}.wav"
-    composition_audio.export(saved_path, format="wav")
+    saved_path = f"{name}.mp3"
+    composition_audio.export(saved_path, format="mp3")
     return saved_path

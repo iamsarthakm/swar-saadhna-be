@@ -10,47 +10,42 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('users', '0001_initial'),
+        ('score_sound', '0001_initial'),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Taal',
+            name='Group',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=255)),
-                ('beats', models.JSONField()),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('is_deleted', models.BooleanField(default=False)),
             ],
         ),
         migrations.CreateModel(
-            name='Composition',
+            name='UserGroup',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('notes_and_beats', models.JSONField()),
-                ('details', models.JSONField(null=True)),
-                ('rhythm', models.CharField(max_length=255)),
-                ('url', models.CharField(max_length=255, null=True)),
+                ('group_permissions', models.JSONField(default=list)),
+                ('audio_permissions', models.JSONField(default=list)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('is_deleted', models.BooleanField(default=False)),
+                ('group', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='groups.group')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='users.user')),
             ],
         ),
         migrations.CreateModel(
-            name='AudioScore',
+            name='GroupAudio',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255)),
-                ('scale', models.CharField(max_length=20)),
-                ('tempo', models.IntegerField()),
-                ('audio_url', models.CharField(max_length=255, null=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('is_deleted', models.BooleanField(default=False)),
-                ('composition', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='score_sound.composition')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='users.user')),
+                ('audio', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='score_sound.audioscore')),
+                ('group', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='groups.group')),
             ],
         ),
     ]

@@ -26,9 +26,7 @@ class Group(models.Model):
 class UserGroup(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
-    group_permissions = models.JSONField(default=list)  # Stores group permissions
-    audio_permissions = models.JSONField(default=list)
-    # role = models.ForeignKey(GroupPermission, on_delete=models.CASCADE)
+    role = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_deleted = models.BooleanField(default=False)

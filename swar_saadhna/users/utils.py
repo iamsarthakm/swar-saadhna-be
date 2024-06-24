@@ -6,8 +6,6 @@ import boto3
 from botocore.exceptions import BotoCoreError, ClientError
 import jwt
 import requests
-
-# from django.core.cache import cache
 from django.conf import settings
 import re
 from swar_saadhna.utils import CustomException
@@ -34,8 +32,8 @@ def send_pin_to_user(username, pin):
         )
 
     elif username_type == "phone":
-        token = get_message_token()
-        response = send_pass_to_user(token, username)
+        pass
+        # response = send_pass_to_user(token, username)
         # send_sms(username, f"The pin for your login is {pin}")
     else:
         raise CustomException("Please enter correct username")
@@ -111,15 +109,38 @@ def get_message_verification_token():
     payload = {}
     headers = {"accept": "*/*"}
     response = requests.request("GET", url, headers=headers, data=payload)
+    timeout_seconds = 7 * 24 * 60 * 60
+    cache.set("auth-msg-token", response.json()["token"], timeout_seconds)
     return response.json()["token"]
 
 
-def send_pass_to_user(token, phone_number):
-    url = f"https://cpaas.messagecentral.com/verification/v2/verification/send?countryCode=91&customerId=C-DE251B4119374E5&flowType=SMS&mobileNumber={phone_number}"
+def send_otp_to_user(phone_number):
+    url = f"https://cpaas.messagecentral.com/verification/v2/verification/send?countryCode=91&customerId={settings.MC_CUSTOMER_ID}&flowType=SMS&mobileNumber={phone_number}"
 
     payload = {}
+    token = get_auth_msg_token()
     headers = {"authToken": token}
 
     response = requests.request("POST", url, headers=headers, data=payload)
+    print(response.json())
+    return response.json()["data"]["verificationId"]
 
-    return response.json()
+
+def verify_otp(phone_number, otp, verification_id):
+    print(phone_number, otp, verification_id)
+    url = f"https://cpaas.messagecentral.com/verification/v2/verification/validateOtp?countryCode=91&mobileNumber={phone_number}&verificationId={verification_id}&customerId={settings.MC_CUSTOMER_ID}&code={otp}"
+
+    payload = {}
+    token = get_auth_msg_token()
+    headers = {"authToken": token}
+
+    response = requests.request("GET", url, headers=headers, data=payload)
+    print(response.json())
+    return response.json()["responseCode"]
+
+
+def get_auth_msg_token():
+    if token := cache.get("auth-msg-token"):
+        return token
+    else:
+        return get_message_verification_token()

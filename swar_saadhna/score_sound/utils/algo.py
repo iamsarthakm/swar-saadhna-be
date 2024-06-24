@@ -129,6 +129,6 @@ def generate_audios_algo(scale, tempo, instrument, rhythm, composition, name):
     composition_audio = get_audio_composition(
         tempo, instrument_audio, rhythm_audios, composition
     )
-    saved_path = f"{name}.wav"
-    composition_audio.export(saved_path, format="wav")
+    saved_path = f"{name}.mp3"
+    composition_audio.export(saved_path, format="mp3")
     return saved_path

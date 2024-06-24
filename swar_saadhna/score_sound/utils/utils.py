@@ -63,7 +63,9 @@ def get_audio_util(user_id, params):
     order = params["sort_dir"] + params["sort_col"]
     print(user_id)
     audios_list = (
-        AudioScore.objects.filter(name__icontains=search, user__id=user_id)
+        AudioScore.objects.filter(
+            name__icontains=search, user__id=user_id, is_deleted=False
+        )
         .order_by(order)
         .values()[offset : limit + offset]
     )
@@ -82,7 +84,9 @@ def get_composition_util(user_id, params):
     limit = params["limit"]
     order = params["sort_dir"] + params["sort_col"]
     compositions = (
-        Composition.objects.filter(name__icontains=search, user__id=user_id)
+        Composition.objects.filter(
+            name__icontains=search, user__id=user_id, is_deleted=False
+        )
         .order_by(order)
         .values()[offset : limit + offset]
     )

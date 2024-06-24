@@ -42,7 +42,7 @@ class GetAudioSerializer(serializers.Serializer):
 class AudioScoreSerializer(serializers.ModelSerializer):
     class Meta:
         model = AudioScore
-        fields = "__all__"
+        fields = ["id", "name"]
 
 
 class CreateTaalSerializer(serializers.Serializer):

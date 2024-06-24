@@ -4,6 +4,8 @@ from rest_framework import status
 from .serializers import (
     UserRegisterSerializer,
     UserLoginSerializer,
+    SendOTPSerializer,
+    VerifyOTPSerializer,
 )
 from .handlers import UserHandlers
 
@@ -27,6 +29,17 @@ class Login(APIView):
         return UserHandlers.login(validate_data.validated_data)
 
 
-class Test(APIView):
+class SendOTP(APIView):
     def get(self, request):
-        return Response("sfsdf", status.HTTP_422_UNPROCESSABLE_ENTITY)
+        validate_data = SendOTPSerializer(data=request.query_params)
+        if not validate_data.is_valid():
+            return Response(validate_data.errors, status.HTTP_422_UNPROCESSABLE_ENTITY)
+        return UserHandlers.send_otp(validate_data.validated_data)
+
+
+class VerifyOTP(APIView):
+    def post(self, request):
+        validate_data = VerifyOTPSerializer(data=request.data)
+        if not validate_data.is_valid():
+            return Response(validate_data.errors, status.HTTP_422_UNPROCESSABLE_ENTITY)
+        return UserHandlers.verify_otp(validate_data.validated_data)

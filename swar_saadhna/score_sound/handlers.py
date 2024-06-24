@@ -27,24 +27,29 @@ class AudioHandler:
         validate_data = GetAudioSerializer(data=request.query_params)
         if not validate_data.is_valid():
             return Response(
-                {"message": validate_data.errors},
+                {"message": "Error encountered while fetching audios"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
         user_id = get_user_id_from_token(request)
         audios_data = get_audio_util(user_id, validate_data.validated_data)
-        return Response(audios_data, status=status.HTTP_200_OK)
+        return Response(
+            {"data": audios_data, "message": "Audios fetched sucessfully"},
+            status=status.HTTP_200_OK,
+        )
 
     def create_audio(request):
         validate_data = CreateAudioSerializers(data=request.data)
         if not validate_data.is_valid():
             return Response(
-                {"message": validate_data.errors},
+                {"message": "Error encountered while creating audios"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
         name, scale, tempo, instrument, composition_id = get_music_data(
             validate_data.validated_data, request
         )
-        composition_obj = Composition.objects.filter(id=composition_id).first()
+        composition_obj = Composition.objects.filter(
+            id=composition_id, is_deleted=False
+        ).first()
         rhythm = composition_obj.rhythm
         composition = composition_obj.notes_and_beats
         user_id = get_user_id_from_token(request)
@@ -53,7 +58,7 @@ class AudioHandler:
         )
 
         audio_url = save_to_s3(
-            temp_audio_path, f"saved-media/{name}-{uuid.uuid4()}.wav"
+            temp_audio_path, f"saved-media/{name}-{uuid.uuid4()}.mp3"
         )
         os.remove(temp_audio_path)
         audio_obj_details = AudioScore.objects.create(
@@ -65,14 +70,19 @@ class AudioHandler:
             audio_url=audio_url,
         )
         serializer = AudioScoreSerializer(audio_obj_details)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(
+            {"data": serializer.data, "message": "Audios created successfully"},
+            status=status.HTTP_200_OK,
+        )
 
 
 class TaalHandler:
     def get_taal(request):
         name = request.query_params["name"]
-        taal = Taal.objects.filter(name=name).first()
-        return Response(taal.beats, status=status.HTTP_200_OK)
+        taal = Taal.objects.filter(name=name, is_deleted=False).first()
+        return Response(
+            {"data": taal.beats, "message": "ok"}, status=status.HTTP_200_OK
+        )
 
     def create_taal(request):
         validate_data = CreateTaalSerializer(data=request.data)
@@ -84,7 +94,10 @@ class TaalHandler:
         name = validate_data.validated_data["name"]
         beats = validate_data.validated_data["beats"]
         taal = Taal.objects.create(name=name, beats=beats)
-        return Response(taal.name, status=status.HTTP_200_OK)
+        return Response(
+            {"data": taal.name, "message": "Taal created successfully"},
+            status=status.HTTP_200_OK,
+        )
 
 
 class CompositionHandler:
@@ -96,8 +109,10 @@ class CompositionHandler:
                 status=status.HTTP_400_BAD_REQUEST,
             )
         user_id = get_user_id_from_token(request)
-        audios_data = get_composition_util(user_id, validate_data.validated_data)
-        return Response(audios_data, status=status.HTTP_200_OK)
+        comps_data = get_composition_util(user_id, validate_data.validated_data)
+        return Response(
+            {"data": comps_data, "message": "ok"}, status=status.HTTP_200_OK
+        )
 
     def create_composition(request):
         validate_data = CreateCompositionSerializer(data=request.data)
@@ -107,5 +122,8 @@ class CompositionHandler:
                 status=status.HTTP_400_BAD_REQUEST,
             )
         user_id = get_user_id_from_token(request)
-        audios_data = create_composition_util(user_id, validate_data.validated_data)
-        return Response(audios_data, status=status.HTTP_200_OK)
+        comps_data = create_composition_util(user_id, validate_data.validated_data)
+        return Response(
+            {"data": comps_data, "message": "Composition created successfully"},
+            status=status.HTTP_200_OK,
+        )

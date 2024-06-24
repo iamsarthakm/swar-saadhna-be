@@ -17,3 +17,19 @@ class UserLoginSerializer(serializers.Serializer):
 
     def validate(self, attrs):
         return super().validate(attrs)
+
+
+class SendOTPSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=255)
+
+    def validate(self, attrs):
+        return super().validate(attrs)
+
+
+class VerifyOTPSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=255)
+    otp = serializers.CharField(max_length=10)
+    verification_id = serializers.CharField(max_length=255)
+
+    def validate(self, attrs):
+        return super().validate(attrs)

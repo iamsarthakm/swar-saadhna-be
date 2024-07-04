@@ -42,6 +42,7 @@ class GroupHandlers:
                 "name": group["name"],
                 "users_count": group["num_users"],
                 "audios_count": group["num_audios"],
+                "role": group["usergroup__role"],
             }
             output.append(group_info)
 

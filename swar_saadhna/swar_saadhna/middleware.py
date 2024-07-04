@@ -13,8 +13,11 @@ logger = logging.getLogger(__name__)
 
 def VerifyAuthToken(get_response):
     def middleware(request):
-        print("yayaaayay")
-        if "register" in request.path or "login" in request.path:
+        if (
+            "register" in request.path
+            or "login" in request.path
+            or "otp" in request.path
+        ):
             return get_response(request)
         if not request.headers.get("Authorization"):
             response = custom_error_response("Authorization token not found.")

@@ -10,7 +10,7 @@ from django.conf import settings
 import re
 from swar_saadhna.utils import CustomException
 from django.core.cache import cache
-
+from swar_saadhna.templates import send_password_template
 
 def check_credentials(username, password):
     user = User.objects.filter(username=username, is_deleted=False).first()
@@ -23,12 +23,14 @@ def check_credentials(username, password):
 def send_pin_to_user(username, pin):
     username_type = is_email_or_phone(username)
     if username_type == "email":
+
         send_mail(
             "Swar Saadhan PIN",
-            pin,
-            "Don't Reply <do_not_reply@swarSaadhna.com>",
-            [username],
+            html_message=send_password_template(pin),
             fail_silently=False,
+            from_email="Don't Reply <do_not_reply@swarSaadhna.com>",
+            recipient_list=[username],
+            message=None,
         )
 
     elif username_type == "phone":

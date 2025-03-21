@@ -5,3 +5,4 @@ env
 .vscode
 /swar_saadhna/request_logs.log
 dump.rdb
+venv

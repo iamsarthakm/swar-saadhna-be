@@ -9,3 +9,5 @@ ffprobe
 PyJWT==2.8.0
 boto3
 django-redis
+django-cors-headers
+requests
